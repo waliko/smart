@@ -53,6 +53,7 @@ ln -s ${scj_dir_name}/cgi/common.php common.php
 
 chown -R boss:boss /home/www/$domain
 
+mysql -uuserdb -puserpass $domain1 -e "delete from rot_pages" >/dev/null 2>/dev/null
 mysql -uuserdb -puserpass $domain1 < /home/www/$domain/www/*.sql 2>/dev/null
 
 crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q cron.php"; } | crontab -uboss -
