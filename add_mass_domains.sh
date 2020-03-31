@@ -31,21 +31,19 @@ cp nginx.domain.name.conf /etc/nginx/conf.d/$domain.conf
 sed -i 's/default/'$domain'/g' /etc/nginx/conf.d/$domain.conf
 sed -i 's/\/scj\//\/'$scj_dir_name'\//g' /etc/nginx/conf.d/$domain.conf
 
-count_tpl='1-5';
-rand_tpl=`cat /dev/urandom | tr -dc $count_tpl | head -c1`;
+rand_tpl=`ls tpl/ | shuf -n1`
 
-unzip -q tpl/${rand_tpl}.zip -d /home/www/$domain/www
+unzip -q tpl/${rand_tpl} -d /home/www/$domain/www
 
 chmod -R 775 /home/www/$domain
 
 mysql -uuserdb -puserpass -e "create database $domain1" >/dev/null 2>/dev/null 
 
 cd /home/www/$domain/www
-#curl -sS http://smartcj.com/updates2/install | php -- mysql_host=localhost mysql_user=userdb mysql_pass=userpass mysql_name=$domain1 scj_folder=$scj_dir_name domain=$domain admin_email=admin@$domain | grep "Script Installation is done" | sed "s/Script.*is '\([a-z]*\)'\./\1/g" >> /home/boss/domain_data.txt
 
 pass=`curl -sS http://smartcj.com/updates2/install | php -- mysql_host=localhost mysql_user=userdb mysql_pass=userpass mysql_name=$domain1 scj_folder=$scj_dir_name domain=$domain admin_email=admin@$domain 2>/dev/null | grep "Script Installation is done" | sed "s/ Script.*is '\([a-z]*\)'\./\1/g"`
 
-echo "${domain}/${scj_dir_name}/admin/ => ${pass} DB: ${domain1}" >> /home/boss/domain_data.txt
+echo "${domain}/${scj_dir_name}/admin/ => ${pass} DB: ${domain1} TPL: ${rand_tpl}" >> /home/boss/domain_data.txt
 
 ln -s ${scj_dir_name}/cgi/index.php index.php
 ln -s ${scj_dir_name}/cgi/out.php out.php
@@ -60,6 +58,9 @@ crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/www/$domain/www/${scj_dir_
 crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q rotation.php"; } | crontab -uboss -
 
 echo "cd /home/www/$domain/www/${scj_dir_name}/admin; env HTTP_HOST=$domain /usr/bin/php update.php" >> /home/boss/update.sh
+
+cd /home/www/$domain/www/${scj_dir_name}/admin
+sudo -uboss env HTTP_HOST=$domain /usr/bin/php update.php
 
 echo $domain complete
 fi
