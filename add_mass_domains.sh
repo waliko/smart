@@ -54,8 +54,12 @@ chown -R boss:boss /home/www/$domain
 mysql -uuserdb -puserpass $domain1 -e "delete from rot_pages" >/dev/null 2>/dev/null
 mysql -uuserdb -puserpass $domain1 < /home/www/$domain/www/*.sql 2>/dev/null
 
-crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q cron.php"; } | crontab -uboss -
-crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q rotation.php"; } | crontab -uboss -
+#crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q cron.php"; } | crontab -uboss -
+#crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q rotation.php"; } | crontab -uboss -
+
+echo "cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q cron.php &" >> /home/cron.sh
+echo "cd /home/www/$domain/www/${scj_dir_name}/bin; env HTTP_HOST=$domain /usr/bin/php -q rotation.php &" >> /home/cron.sh
+echo "sleep 2" >> /home/cron.sh
 
 echo "cd /home/www/$domain/www/${scj_dir_name}/admin; env HTTP_HOST=$domain /usr/bin/php update.php" >> /home/boss/update.sh
 
