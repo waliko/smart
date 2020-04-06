@@ -17,6 +17,10 @@ cat update.sh | grep -v $domain > update_.sh
 cat update_.sh > update.sh
 rm update_.sh
 
-crontab -l -uboss | grep -v $domain | crontab -uboss -
+#crontab -l -uboss | grep -v $domain | crontab -uboss -
+
+cat cron.sh | grep -v $domain > cron_.sh
+cat cron_.sh > cron.sh
+rm cron_.sh
 
 echo "Complete";
