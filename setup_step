@@ -1,0 +1,32 @@
+apt update
+adduser boss
+apt -y install mc curl zip htop unzip wget
+apt -y install nginx
+apt -y install php php-cli php-common php-mysql php-gd php-ldap php-odbc php-curl php-pear php-xml php-xmlrpc php-mbstring php-snmp php-zip
+systemctl disable apache2
+apt -y install mysql-server
+apt -y install php-fpm
+apt -y install imagemagick
+apt -y install net-tools
+apt -y install whois
+mkdir /home/www
+chown boss:boss /home/www/
+usermod -a -G boss www-data
+wget https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.zip
+unzip -d /usr/local/ ioncube_loaders_lin_x86-64.zip
+echo "zend_extension = /usr/local/ioncube/ioncube_loader_lin_7.2.so" >> /etc/php/7.2/fpm/php.ini
+echo "zend_extension = /usr/local/ioncube/ioncube_loader_lin_7.2.so" >> /etc/php/7.2/cli/php.ini
+/etc/init.d/php7.2-fpm restart
+mysql -e 'GRANT ALL PRIVILEGES ON *.* TO userdb@localhost  IDENTIFIED BY "userpass"'
+mysql -e 'FLUSH PRIVILEGES'
+crontab -l -uboss | { cat; echo "*/1 * * * * cd /home/boss && ./cron.sh &>> cron.log"; } | crontab -uboss -
+crontab -l -uboss | { cat; echo "0 */2 * * * cd /home/boss && ./update.sh &>> update.log"; } | crontab -uboss -
+wget https://github.com/waliko/smart/archive/master.zip
+unzip -j -d /home/boss/ master.zip
+chmod +x /home/boss/*.sh
+mv /home/boss/nginx.conf /etc/nginx/nginx.conf
+mv /home/boss/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+/etc/init.d/nginx restart
+/etc/init.d/mysql restart
+update-alternatives --config editor
+
