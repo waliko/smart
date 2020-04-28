@@ -19,7 +19,7 @@ rm -f /etc/nginx/conf.d/$domain.conf
 
 rm -rf /home/www/$domain
 
-dir=`find /home/www/${domain}/www -type d -name 'includes'
+dir=`find /home/www/${domain}/www -type d -name 'includes'`
 db=`cat $dir/config.php | grep 'db_database' | sed "s%\\$config\[\"db_database\"\] = '%%g" | sed "s%';%%g"`
 if [ -z "$db" ]
 then
